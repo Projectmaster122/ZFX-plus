@@ -1,12 +1,17 @@
 using System;
 
-namespace ZFX 
+namespace ZFX
 {
-    class Flags 
+    public struct Field
     {
-        ///<summary>
-        ///Toggle debug Messages
-        ///<summary/>
+        // init bitfield for enableBoot
+
+        public bool enableBoot;
+        public int ring;
         public bool DebugMessages;
+    }
+    internal class Flags
+    {
+
     }
 }

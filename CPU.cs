@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ZFX
 {
-    internal class CPU
+    class CPU
     {
        ///<summary>
        ///System initted
@@ -36,16 +36,14 @@ namespace ZFX
         /// </summary>
         public Field Flags;
         /// <summary>
-        /// Print a string to the debug console
+        /// Registers structure for Zarch.
         /// </summary>
-        /// <paramref name="Message">Message to write</param>
-        public void WriteDebug(string Message)
+        struct ZRegisters 
         {
-            if (Flags.DebugMessages)
-            {
-                Debug.WriteLine("[DEBUG] " + Message);
-            }
-        }  
+            long dreg1;
+            long dreg2;
+            int pcounter;
+        }
         ///<summary>
         ///Halt the system.
         ///</summary>
@@ -53,7 +51,7 @@ namespace ZFX
         {
             memclean(0, bitsize);
             RAM = null;
-            WriteDebug("Halted CPU! Goodbye, World.");
+            Field.WriteDebug("Halted CPU! Goodbye, World.");
             while (true) { }
         }
         ///<summary>
@@ -158,7 +156,7 @@ namespace ZFX
             long[] tmp = new long[eindex];
             for (long i = sindex; i < eindex; i++)
             {
-                WriteDebug("Read indexes from " + sindex + "to " + eindex);
+                Field.WriteDebug("Read indexes from " + sindex + "to " + eindex);
                 tmp[i] = RAM[i];
             }
             return tmp;
@@ -181,7 +179,7 @@ namespace ZFX
                 {
                     break;
                 }
-                WriteDebug("Read indexes from " + sindex + "to nullbyte");    
+                Field.WriteDebug("Read indexes from " + sindex + "to nullbyte");    
                 tmp.Add(RAM[i]);
             }
             return tmp.ToArray();
@@ -221,7 +219,7 @@ namespace ZFX
                 panic(PanicType.gp);
                 return;
             }
-            WriteDebug("Wrote " + val + "to " + index);
+            Field.WriteDebug("Wrote " + val + "to " + index);
             RAM[index] = val;
         }
         ///<summary>
@@ -235,7 +233,7 @@ namespace ZFX
                 panic(PanicType.gp);
                 return;
             }
-            WriteDebug("Incremented " + index);
+            Field.WriteDebug("Incremented " + index);
             RAM[index]++;
         }
         ///<summary>
@@ -278,7 +276,7 @@ namespace ZFX
         public void memcmp(int l1, int l2, int wh)
         {
             setMemLoc(wh, l1 == l2 ? 1 : 0);
-                       WriteDebug("Compared " + l1 + " with " + l2 + " and got " + (l1 == l2).ToString());
+                       Field.WriteDebug("Compared " + l1 + " with " + l2 + " and got " + (l1 == l2).ToString());
         }
         ///<summary>
         ///Swap indexes.
@@ -290,7 +288,7 @@ namespace ZFX
             RAM[i1] = RAM[i1] + RAM[i2];
             RAM[i2] = RAM[i1] - RAM[i2];
             RAM[i1] = RAM[i1] - RAM[i2];
-            WriteDebug("Swapped " + i1 + "with " + i2);
+            Field.WriteDebug("Swapped " + i1 + "with " + i2);
         }
         ///<summary>
         ///Read to memory
@@ -304,7 +302,7 @@ namespace ZFX
                 setMemLoc(i + startIndex, a[i]);
                 
             }
-            WriteDebug("Read input " + a + "and storing at " + startIndex);
+            Field.WriteDebug("Read input " + a + "and storing at " + startIndex);
         }
         /// <summary>
         /// Print string and save it to memory (from 0 to length of string)
@@ -499,7 +497,6 @@ namespace ZFX
                 hlt();
             }
             init = true;
-
         }
     }
 }

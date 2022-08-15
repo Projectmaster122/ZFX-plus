@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 
 namespace ZFX
@@ -42,7 +43,7 @@ namespace ZFX
         {
             if (Flags.DebugMessages)
             {
-                prnt("[DEBUG] " + Message);
+                Debug.WriteLine("[DEBUG] " + Message);
             }
         }  
         ///<summary>

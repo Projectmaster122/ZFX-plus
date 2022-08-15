@@ -11,10 +11,6 @@ namespace ZFX
         //</summary>
         public bool init = false;
         /// <summary>
-        /// Locator to network
-        /// </summary>
-        public Network Network;
-        /// <summary>
         /// RAM array
         /// </summary>
         public long[] RAM { get; private set; }
@@ -294,15 +290,13 @@ namespace ZFX
         ///Read to memory
         ///</summary>
         ///<param name="startIndex">Index to start saving to (default:0)</param>
-        public void rde(long startIndex = 0)
+        public void rde(long startIndex = 0, string a)
         {
-            string a = Console.ReadLine();
             for (int i = 0; i < a.Length; i++)
             {
                 setMemLoc(i + startIndex, a[i]);
-                
             }
-            Field.WriteDebug("Read input " + a + "and storing at " + startIndex);
+            Field.WriteDebug("Received string a " + a + "and storing at " + startIndex);
         }
         /// <summary>
         /// Print string and save it to memory (from 0 to length of string)
@@ -430,9 +424,6 @@ namespace ZFX
         /// Init system
         /// </summary>
         /// <param name="bitSystem">Size of RAM in KB</param>
-        /// <param name="RILLENGTH">The amount of indexes possible to reserve</param>
-
-
         public CPU(long bitSystem = 2)
         {
             initd(bitSystem * 1024);
@@ -446,8 +437,7 @@ namespace ZFX
         /// </summary>
         /// <param name="memsize">Amount of memory to allocate</param>
         /// <param name="ring">The ring you want to start the os in</param>
-        /// <param name="rilcsize">The size of the array RILC</param>
-        public void initd(long memsize)
+        public void initd(long memsize, int ring)
         {
             if (init)
             {

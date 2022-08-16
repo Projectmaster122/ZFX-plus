@@ -1,8 +1,8 @@
 using System.Diagnostics;
 
-namespace ZFX
+namespace ZFXplus
 {
-    public struct Field
+    struct Field
     {
         // init bitfield for enableBoot
 

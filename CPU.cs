@@ -6,8 +6,8 @@ namespace ZFX
 {
     class CPU
     {
-       ///<summary>
-       ///System initted
+        ///<summary>
+        ///System initted
         //</summary>
         public bool init = false;
         /// <summary>
@@ -18,10 +18,6 @@ namespace ZFX
         ///Size of RAM in KB.
         ///</summary>
         public long bitsize { get; private set; }
-        /// <summary>
-        /// Current ring. Before init is true this is set to null
-        /// </summary>
-        public int? ring = null;
         /// <summary>
         /// The List of reserved indexes
         /// </summary>
@@ -83,12 +79,6 @@ namespace ZFX
                     case PanicType.matherror:
                         pMsg = "Math Error";
                         break;
-                    case PanicType.permdenied:
-                        pMsg = "Permission Denied";
-                        break;
-                    case PanicType.ringinvalid:
-                        pMsg = "Invalid ring. Existing rings: 3, 0. Current Ring: " + rdI(1024) + ".";
-                        break;
                 }
                 Console.WriteLine("Error during execution\n{0}", pMsg);
                 memclean(0, bitsize);
@@ -106,7 +96,7 @@ namespace ZFX
         /// </summary>
         /// <param name="index">Index to read</param>
         /// <returns>Value of index (int)</returns>
-        public long rdI(long index)
+        public long ReadIndex(long index)
         {
             if (index < 0 || index > bitsize) { panic(PanicType.gp); return 0; }
             return RAM[index];
@@ -147,7 +137,7 @@ namespace ZFX
         /// <summary>
         /// Reads an array of indexes
         /// </summary>
-        public long[] rd(long sindex, long eindex)
+        public long[] ReadIndexArray(long sindex, long eindex)
         {
             long[] tmp = new long[eindex];
             for (long i = sindex; i < eindex; i++)
@@ -272,7 +262,7 @@ namespace ZFX
         public void memcmp(int l1, int l2, int wh)
         {
             setMemLoc(wh, l1 == l2 ? 1 : 0);
-                       Field.WriteDebug("Compared " + l1 + " with " + l2 + " and got " + (l1 == l2).ToString());
+            Field.WriteDebug("Compared " + l1 + " with " + l2 + " and got " + (l1 == l2).ToString());
         }
         ///<summary>
         ///Swap indexes.
@@ -284,7 +274,7 @@ namespace ZFX
             RAM[i1] = RAM[i1] + RAM[i2];
             RAM[i2] = RAM[i1] - RAM[i2];
             RAM[i1] = RAM[i1] - RAM[i2];
-            Field.WriteDebug("Swapped " + i1 + "with " + i2);
+            Field.WriteDebug("Swapped " + i1 + " with " + i2);
         }
         ///<summary>
         ///Read to memory
@@ -431,13 +421,12 @@ namespace ZFX
         /// <summary>
         /// Enum for every panic scenario
         /// </summary>
-        public enum PanicType { criticalerror, gp, matherror, permdenied, ringinvalid }
+        public enum PanicType { criticalerror, gp, matherror }
         /// <summary>
         /// Init function, Can only be run once. USE AT YOUR OWN RISK!
         /// </summary>
         /// <param name="memsize">Amount of memory to allocate</param>
-        /// <param name="ring">The ring you want to start the os in</param>
-        public void initd(long memsize, int ring)
+        public void initd(long memsize)
         {
             if (init)
             {
@@ -482,10 +471,6 @@ namespace ZFX
  
             }
 
-            if(Flags.ring != 0 && Flags.ring != 3)
-            {
-                hlt();
-            }
             init = true;
         }
     }

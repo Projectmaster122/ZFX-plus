@@ -7,7 +7,6 @@ namespace ZFX
         // init bitfield for enableBoot
 
         public bool enableBoot;
-        public int ring;
         public bool DebugMessages;
 
         public void Field.WriteDebug(string Message)
@@ -17,10 +16,5 @@ namespace ZFX
                 Debug.WriteLine("[DEBUG] " + Message);
             }
         }
-    }
-
-    internal class Flags
-    {
-
     }
 }

@@ -1,8 +1,7 @@
 using System;
-using System.Diagnostics;
 using System.Collections.Generic;
 
-namespace ZFX
+namespace ZFXplus
 {
     class CPU
     {
@@ -30,7 +29,6 @@ namespace ZFX
 
         public long dreg1;
         public long dreg2;
-        public int pcounter;
 
         /// <summary>
         /// Set DREG1 register data.
@@ -39,6 +37,7 @@ namespace ZFX
         public void SetDreg1Data(long Value)
         {
             dreg1 = Value;
+            Field.WriteDebug("DREG1 has been set to " + Value + ".");
         }
 
         /// <summary>
@@ -47,6 +46,7 @@ namespace ZFX
         /// <returns>Value of DREG1 (long)</returns>
         public long GetDreg1Data()
         {
+            Field.WriteDebug("DREG1's value is " + dreg1 + ".");
             return dreg1;
         }
 
@@ -57,6 +57,7 @@ namespace ZFX
         public void SetDreg2Data(long Value)
         {
             dreg2 = Value;
+            Field.WriteDebug("DREG2 has been set to " + Value + ".");
         }
 
         /// <summary>
@@ -65,8 +66,17 @@ namespace ZFX
         /// <returns>Value of DREG2 data.</returns>
         public long GetDreg2Data()
         {
+            Field.WriteDebug("DREG2's value is " + dreg2 + ".");
             return dreg2;
         }
+
+        public void SwapDregData()
+        {
+            Field.WriteDebug("Swapped DREG1: " + dreg1 + "with DREG2: " + dreg2);
+            dreg1 = dreg2;
+            dreg2 = dreg1;
+        }
+
         ///<summary>
         ///Halt the system.
         ///</summary>
@@ -145,10 +155,6 @@ namespace ZFX
             }
             return tmp;
         }
-        /// <summary>
-        /// Pointer to the display class
-        /// </summary>
-        public Display Display;
         /// <summary>
         /// Reads from starting index untill the end of the RAM (unless its 0, use at your own risk)
         /// </summary>
@@ -284,55 +290,23 @@ namespace ZFX
         }
 
         /// <summary>
-        /// Print memory locations 
-        /// </summary>
-        /// <param name="from">From (default:0)</param>
-        /// <param name="to">To (default:0)</param>
-        public void prnt(int from = 0, int to = 0)
-        {
-            // function use
-            {
-                if (to == 0)
-                {
-                    for (int i = from; i < bitsize; i++)
-                    {
-                        if (RAM[i] == 0)
-                        {
-                            to = i;
-                            break;
-                        }
-                    }
-                }
-                for (int i = from; i < to; i++)
-                {
-                    if (RAM[i] > 255)
-                    {
-                        Debug.WriteLine("?");
-                    }
-                    else
-                        Debug.WriteLine((char)RAM[i]);
-                }
-            }
-        }
-        /// <summary>
         /// Sum
         /// </summary>
         /// <param name="l1">n1</param>
         /// <param name="l2">n2</param>
         /// <param name="wh">Index to store</param>
-        public void add(int l1, int l2, int wh)
+        public void add(int l1, int l2)
         {
-            setMemLoc(wh, l1 + l2);
+            SetDreg1Data(l1 + l2);
         }
         /// <summary>
         /// Sub
         /// </summary>
         /// <param name="l1">n1</param>
         /// <param name="l2">n2</param>
-        /// <param name="wh">Index to store</param>
-        public void sub(int l1, int l2, int wh)
+        public void sub(int l1, int l2)
         {
-            setMemLoc(wh, l1 - l2);
+            SetDreg1Data(l1 - l2);
         }
         /// <summary>
         /// Mul
@@ -342,7 +316,7 @@ namespace ZFX
         /// <param name="wh">Index to store</param>
         public void mul(int l1, int l2, int wh)
         {
-            setMemLoc(wh, l1 * l2);
+            SetDreg2Data(l1 * l2);
         }
         /// <summary>
         /// Div
@@ -362,17 +336,16 @@ namespace ZFX
         /// <param name="wh">Index to store</param>
         public void sqrt(int l, int wh)
         {
-            setMemLoc(wh, Convert.ToInt32(Math.Round(Math.Sqrt(l))));
+            SetDreg2Data(Convert.ToInt32(Math.Round(Math.Sqrt(l))));
         }
         /// <summary>
         /// Power of
         /// </summary>
-        /// <param name="l1">n1</param>
-        /// <param name="l2">n2</param>
-        /// <param name="wh">Index to store</param>
-        public void pow(int l1, int l2, int wh)
+        /// <param name="l1">base</param>
+        /// <param name="l2">exponent</param>
+        public void pow(int l1, int l2)
         {
-            setMemLoc(wh, Convert.ToInt32(Math.Round(Math.Pow(l1, l2))));
+            SetDreg2Data(Convert.ToInt32(Math.Round(Math.Pow(l1, l2))));
         }
         /// <summary>
         /// Init system
@@ -382,10 +355,6 @@ namespace ZFX
         {
             initd(bitSystem * 1024);
         }
-        /// <summary>
-        /// Enum for every panic scenario
-        /// </summary>
-        public enum PanicType { criticalerror, gp, matherror }
         /// <summary>
         /// Init function, Can only be run once. USE AT YOUR OWN RISK!
         /// </summary>
@@ -429,10 +398,7 @@ namespace ZFX
                     }
                     memclean(0, bitsize);
                 }
-
- 
             }
-
             init = true;
         }
     }

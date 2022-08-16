@@ -26,15 +26,46 @@ namespace ZFX
         /// <summary>
         /// Flags for CPU.cs. MUST SET EXACTLY AFTER INITIALIZATION. NO CALLS BEFOREHAND
         /// </summary>
-        public Field Flags;
+        public Field Field;
+
+        public long dreg1;
+        public long dreg2;
+        public int pcounter;
+
         /// <summary>
-        /// Registers structure for Zarch.
+        /// Set DREG1 register data.
         /// </summary>
-        struct ZRegisters 
+        /// <param name="Value">Value to set DREG1 to</param>
+        public void SetDreg1Data(long Value)
         {
-            long dreg1;
-            long dreg2;
-            int pcounter;
+            dreg1 = Value;
+        }
+
+        /// <summary>
+        /// Get DREG1 register data.
+        /// </summary>
+        /// <returns>Value of DREG1 (long)</returns>
+        public long GetDreg1Data()
+        {
+            return dreg1;
+        }
+
+        /// <summary>
+        /// Set DREG2 register data.
+        /// </summary>
+        /// <param name="Value">Value to set DREG2 to.</param>
+        public void SetDreg2Data(long Value)
+        {
+            dreg2 = Value;
+        }
+
+        /// <summary>
+        /// Get DREG2 register data.
+        /// </summary>
+        /// <returns>Value of DREG2 data.</returns>
+        public long GetDreg2Data()
+        {
+            return dreg2;
         }
         ///<summary>
         ///Halt the system.
@@ -58,39 +89,7 @@ namespace ZFX
                 setMemLoc(i, 0);
             }
         }
-        /// <summary>
-        /// BSOD the system
-        /// </summary>
-        /// <param name="panicType">Type of panic, type: enum</param>
-        public void panic(PanicType panicType)
-        {
-            if(Flags.enableBoot)
-            {
-                Console.Clear();
-                string pMsg = "";
-                switch (panicType)
-                {
-                    case PanicType.criticalerror:
-                        pMsg = "Critical Error";
-                        break;
-                    case PanicType.gp:
-                        pMsg = "General Protection";
-                        break;
-                    case PanicType.matherror:
-                        pMsg = "Math Error";
-                        break;
-                }
-                Console.WriteLine("Error during execution\n{0}", pMsg);
-                memclean(0, bitsize);
-                Console.ReadLine();
-                Environment.Exit(1);
 
-            }else
-            {
-                hlt();
-            }
-
-        }
         /// <summary>
         /// Read index.
         /// </summary>
@@ -98,7 +97,7 @@ namespace ZFX
         /// <returns>Value of index (int)</returns>
         public long ReadIndex(long index)
         {
-            if (index < 0 || index > bitsize) { panic(PanicType.gp); return 0; }
+            if (index < 0 || index > bitsize) { return 0; }
             return RAM[index];
         }
         /// <summary>
@@ -109,7 +108,6 @@ namespace ZFX
         {
             if (i >= bitsize)
             {
-                panic(PanicType.gp);
                 return;
             }
             RIL[i] = RAM[i];
@@ -179,7 +177,6 @@ namespace ZFX
         {
             if (from >= bitsize || to >= bitsize)
             {
-                panic(PanicType.gp);
                 return;
             }
             RAM[to] = RAM[from];
@@ -193,7 +190,6 @@ namespace ZFX
         {
             if (index >= bitsize || IsReserved(index))
             {
-                panic(PanicType.gp);
                 return;
             }
             this.RAM[index] = val;
@@ -202,7 +198,6 @@ namespace ZFX
         {
             if (index >= bitsize)
             {
-                panic(PanicType.gp);
                 return;
             }
             Field.WriteDebug("Wrote " + val + "to " + index);
@@ -216,7 +211,6 @@ namespace ZFX
         {
             if (index >= bitsize)
             {
-                panic(PanicType.gp);
                 return;
             }
             Field.WriteDebug("Incremented " + index);
@@ -280,7 +274,7 @@ namespace ZFX
         ///Read to memory
         ///</summary>
         ///<param name="startIndex">Index to start saving to (default:0)</param>
-        public void rde(long startIndex = 0, string a)
+        public void rde(string a, long startIndex = 0)
         {
             for (int i = 0; i < a.Length; i++)
             {
@@ -288,33 +282,7 @@ namespace ZFX
             }
             Field.WriteDebug("Received string a " + a + "and storing at " + startIndex);
         }
-        /// <summary>
-        /// Print string and save it to memory (from 0 to length of string)
-        /// </summary>
-        /// <param name="pr">String to print</param>
-        public void prnt(string pr, bool _nl = true)
-        {
-            for (int i = 0; i < pr.Length; i++)
-            {
-                setMemLoc(i, (int)pr[i]);
-            }
-            for (int i = 0; i < pr.Length; i++)
-            {
-                Console.Write((char)RAM[i]);
-            }
-            memclean(0, pr.Length);
-            if (_nl)
-            {
-                nl();
-            }
-        }
-        /// <summary>
-        /// Gives a newline
-        /// </summary>
-        public void nl()
-        {
-            Console.Write(Environment.NewLine);
-        }
+
         /// <summary>
         /// Print memory locations 
         /// </summary>
@@ -339,16 +307,12 @@ namespace ZFX
                 {
                     if (RAM[i] > 255)
                     {
-                        Console.Write("?");
+                        Debug.WriteLine("?");
                     }
                     else
-                        Console.Write((char)RAM[i]);
+                        Debug.WriteLine((char)RAM[i]);
                 }
             }
-            
-            // EOF
-            Console.Write('\n');
-            nl();
         }
         /// <summary>
         /// Sum
@@ -430,7 +394,6 @@ namespace ZFX
         {
             if (init)
             {
-                panic(PanicType.criticalerror);
                 Environment.Exit(1);
             }
             // memtemp init
@@ -464,8 +427,7 @@ namespace ZFX
                     {
                         RIL[i] = null;
                     }
-                    memclean(
-                        0, bitsize);
+                    memclean(0, bitsize);
                 }
 
  

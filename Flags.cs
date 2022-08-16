@@ -1,4 +1,4 @@
-using System;
+using System.Diagnostics;
 
 namespace ZFX
 {
@@ -9,9 +9,9 @@ namespace ZFX
         public bool enableBoot;
         public bool DebugMessages;
 
-        public void Field.WriteDebug(string Message)
+        public void WriteDebug(string Message)
         {
-            if (Flags.DebugMessages)
+            if (DebugMessages)
             {
                 Debug.WriteLine("[DEBUG] " + Message);
             }

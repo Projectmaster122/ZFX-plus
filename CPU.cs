@@ -107,7 +107,7 @@ namespace ZFXplus
         /// <returns>Value of index (int)</returns>
         public long ReadIndex(long index)
         {
-            if (index < 0 || index > bitsize) { return 0; }
+            if (index < 0 || index > bitsize) { hlt() }
             return RAM[index];
         }
         /// <summary>
